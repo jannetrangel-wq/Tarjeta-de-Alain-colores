@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>La Ruta · 21.09.2026</title>
+
+  <!-- SEO & Open Graph Meta -->
+  <meta name="description"
+    content="Una experiencia interactiva y relato de ruta en 4 actos para celebrar la nueva vuelta al sol de Alain.">
+  <meta property="og:title" content="La Ruta · 21.09.2026">
+  <meta property="og:description"
+    content="Hoy no quería mandarte una tarjeta de cumpleaños. Quería regalarte un pequeño viaje.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts: Editorial & Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@300;400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Alex+Brush&display=swap"
+    rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       1. VARIABLES DE DISEÑO Y RESET GLOBAL
+       ========================================================================== */
+    :root {
+      --font-display: 'Cinzel', Georgia, serif;
+      --font-serif: 'Cormorant Garamond', Garamond, Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-signature: 'Alex Brush', cursive;
+
+      /* Paleta Portada */
+      --color-hero-bg: #0b0e14;
+      --color-hero-text: #e2e8f0;
+      --color-gold: #d4af37;
+      --color-gold-light: #f3e5ab;
+
+      /* Paleta Acto I - Hacia Atrás */
+      --color-act1-ink: #1f160e;
+      --color-act1-ink-muted: #4a3827;
+
+      /* Paleta Acto II - Hacia Adelante */
+      --color-act2-green-glow: #4ade80;
+      --color-act2-text: #f1f5f9;
+      --color-act2-muted: #94a3b8;
+
+      /* Paleta Acto III - Hacia Adentro */
+      --color-act3-text: #f8fafc;
+      --color-act3-gold: #fbbf24;
+
+      /* Paleta Acto IV - Hacia Donde Siga */
+      --color-act4-dawn-glow: #e07a5f;
+      --color-act4-sun: #f6bd60;
+      --color-act4-text: #fefae0;
+
+      --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--color-hero-bg);
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      overflow-x: hidden;
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--color-hero-bg);
+    }
+
+    /* Barra de progreso global de ruta */
+    #route-progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(90deg, #c5a059, #4ade80, #fbbf24, #e07a5f);
+      z-index: 9999;
+      transition: width 0.1s linear;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+    }
+
+    /* Contenedor central vertical (Mobile First) */
+    .app-container {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+      background: transparent;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+    }
+
+    /* ==========================================================================
+       2. COMPONENTES GENERALES Y SECCIONES
+       ========================================================================== */
+    section.act-section {
+      position: relative;
+      min-height: 100vh;
+      width: 100%;
+      padding: 5rem 1.5rem 4.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: crosshair;
+    }
+
+    /* Capa interactiva de Canvas POR ENCIMA DE TODO (z-index: 20) */
+    .canvas-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Contenedor de contenido estructurado (z-index: 10) */
+    .act-content-wrapper {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      text-align: left;
+      pointer-events: none;
+    }
+
+    /* Tarjeta translúcida y elegante (.card) */
+    .card,
+    .ethereal-text-block {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      padding: 28px;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.35rem;
+      background: rgba(20, 20, 20, 0.32);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      pointer-events: auto;
+    }
+
+    .act-header-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      opacity: 0.95;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .act-header-tag::before {
+      content: "";
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    .act-title {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.25;
+    }
+
+    .act-text-body {
+      font-size: 1.12rem;
+      line-height: 1.85;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+    }
+
+    .act-text-body p+p {
+      margin-top: 1.15rem;
+    }
+
+    .touch-hint-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      width: fit-content;
+      margin-top: 0.25rem;
+      pointer-events: none;
+      animation: pulseSubtle 3s infinite ease-in-out;
+    }
+
+    @keyframes pulseSubtle {
+
+      0%,
+      100% {
+        opacity: 0.7;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.02);
+      }
+    }
+
+    /* Botones elegantes */
+    .btn-route {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1rem 2rem;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      background: rgba(212, 175, 55, 0.08);
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.4s var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      pointer-events: auto;
+    }
+
+    .btn-route::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .btn-route:hover,
+    .btn-route:active {
+      border-color: var(--color-gold);
+      background: rgba(212, 175, 55, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+    }
+
+    .btn-route:hover::before {
+      left: 100%;
+    }
+
+    /* ==========================================================================
+       3. PORTADA / HERO (Odómetro Dinámico)
+       ========================================================================== */
+    #portada {
+      background: radial-gradient(circle at 50% 30%, #262c38 0%, #14171f 100%);
+      color: var(--color-hero-text);
+      text-align: center;
+      min-height: 100vh;
+      justify-content: center;
+    }
+
+    .portada-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--color-gold);
+      opacity: 0.9;
+      margin-bottom: 1.5rem;
+      display: inline-block;
+    }
+
+    .odometer-wrapper {
+      margin: 1.5rem auto 2.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      padding: 1.25rem 1.5rem;
+      background: linear-gradient(180deg, #11151c 0%, #0a0d12 100%);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      border-radius: 8px;
+      box-shadow:
+        inset 0 2px 4px rgba(255, 255, 255, 0.05),
+        inset 0 -3px 8px rgba(0, 0, 0, 0.8),
+        0 15px 35px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(212, 175, 55, 0.1);
+      position: relative;
+    }
+
+    .odometer-wrapper::before,
+    .odometer-wrapper::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 4px;
+      background: var(--color-gold);
+      border-radius: 50%;
+      opacity: 0.6;
+    }
+
+    .odometer-wrapper::before {
+      left: 8px;
+    }
+
+    .odometer-wrapper::after {
+      right: 8px;
+    }
+
+    .odometer-digit-box {
+      position: relative;
+      width: 32px;
+      height: 48px;
+      background: #06080b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+    }
+
+    .odometer-digit-strip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.1s linear;
+      font-family: var(--font-mono);
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    .odometer-digit-item {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .odometer-separator {
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-gold);
+      padding: 0 0.2rem;
+      opacity: 0.85;
+    }
+
+    .portada-intro-text {
+      font-family: var(--font-serif);
+      font-size: 1.45rem;
+      font-weight: 400;
+      font-style: italic;
+      color: #e2e8f0;
+      line-height: 1.6;
+      max-width: 460px;
+      margin: 0 auto 2.5rem;
+      letter-spacing: 0.01em;
+    }
+
+    .scroll-indicator {
+      margin-top: 3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.4;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      animation: floatSlow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes floatSlow {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(6px);
+      }
+    }
+
+    /* ==========================================================================
+       4. SECCIÓN I · HACIA ATRÁS (fondo-mapa.jpg)
+       ========================================================================== */
+    #hacia-atras,
+    #acto-1 {
+      background-image: url('assets/images/fondo-mapa.jpg');
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      color: #1f160e;
+    }
+
+    #hacia-atras::before,
+    #acto-1::before,
+    #hacia-adelante::before,
+    #acto-2::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(20, 23, 31, 0.35);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    #hacia-atras .card,
+    #acto-1 .card,
+    #hacia-atras .ethereal-text-block,
+    #acto-1 .ethereal-text-block {
+      background: rgba(245, 240, 230, 0.65) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(140, 42, 26, 0.2) !important;
+      border-radius: 20px !important;
+      padding: 28px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+      color: #1f160e !important;
+    }
+
+    #hacia-atras .act-header-tag,
+    #acto-1 .act-header-tag {
+      color: #5c3d24;
+      font-weight: 700;
+    }
+
+    #hacia-atras .act-text-body,
+    #acto-1 .act-text-body {
+      font-family: var(--font-serif);
+      font-size: 1.32rem;
+      line-height: 1.85;
+      color: #1f160e;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+
+    #hacia-atras .touch-hint-pill,
+    #acto-1 .touch-hint-pill {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(59, 40, 24, 0.35);
+      color: #3b2818;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Easter Egg Styling */
+    .easter-egg-trigger {
+      position: relative;
+      display: inline-block;
+      font-weight: 800;
+      color: #8c2a1a;
+      cursor: pointer;
+      text-decoration: underline;
+      text-decoration-style: dashed;
+      text-underline-offset: 4px;
+      text-decoration-color: #8c2a1a;
+      transition: all 0.3s ease;
+      pointer-events: auto;
+    }
+
+    .easter-egg-trigger:hover,
+    .easter-egg-trigger:active {
+      color: #b91c1c;
+      background-color: rgba(140, 42, 26, 0.15);
+      border-radius: 2px;
+    }
+
+    .easter-egg-note {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.9);
+      width: 90%;
+      max-width: 420px;
+      background: #faf4ea;
+      color: #2b221b;
+      padding: 2rem 1.75rem 1.75rem;
+      border: 2px solid #8c2a1a;
+      border-radius: 6px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45), 0 0 0 100vmax rgba(0, 0, 0, 0.55);
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.35s var(--transition-smooth);
+      text-align: center;
+      font-family: var(--font-serif);
+    }
+
+    .easter-egg-note.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .easter-egg-seal {
+      width: 52px;
+      height: 52px;
+      margin: -45px auto 1rem;
+      background: #8c2a1a;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 700;
+      box-shadow: 0 4px 10px rgba(140, 42, 26, 0.4);
+      border: 2px dashed #f5efe6;
+    }
+
+    .easter-egg-note-header {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #8c2a1a;
+      margin-bottom: 0.75rem;
+    }
+
+    .easter-egg-note-content {
+      font-size: 1.25rem;
+      line-height: 1.5;
+      font-weight: 700;
+      color: #1f1813;
+      margin-bottom: 1.25rem;
+    }
+
+    .easter-egg-close-btn {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      background: #8c2a1a;
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: background 0.2s;
+    }
+
+    .easter-egg-close-btn:hover {
+      background: #6e1e12;
+    }
+
+    /* ==========================================================================
+       5. SECCIÓN II · HACIA ADELANTE (fondo-ruta.jpg)
+       ========================================================================== */
+    #hacia-adelante,
+    #acto-2 {
+      background-image: url('assets/images/fondo-ruta.jpg');
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      color: var(--color-act2-text);
+    }
+
+    /* Velo unificador de pizarra tenue sobre las ilustraciones */
+    #hacia-atras::before,
+    #hacia-adelante::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(20, 23, 31, 0.35);
+      /* Tono pizarra tenue translúcido */
+      z-index: 1;
+      /* Encima de la imagen, pero detrás de huellas (z-index: 2) y texto (z-index: 10) */
+      pointer-events: none;
+    }
+
+    #hacia-adelante .card,
+    #acto-2 .card,
+    #hacia-adelante .ethereal-text-block,
+    #acto-2 .ethereal-text-block {
+      background: rgba(20, 20, 20, 0.55) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border-radius: 20px !important;
+      padding: 28px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35) !important;
+      color: #ffffff !important;
+    }
+
+    #hacia-adelante .act-header-tag,
+    #acto-2 .act-header-tag {
+      color: var(--color-act2-green-glow);
+    }
+
+    #hacia-adelante .act-text-body,
+    #acto-2 .act-text-body {
+      font-family: var(--font-sans);
+      color: #ffffff;
+      font-weight: 500;
+      font-size: 1.15rem;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+    }
+
+    #hacia-adelante .touch-hint-pill,
+    #acto-2 .touch-hint-pill {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(74, 222, 128, 0.4);
+      color: #86efac;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ==========================================================================
+       6. SECCIÓN III · HACIA ADENTRO
+       ========================================================================== */
+    #hacia-adentro,
+    #acto-3 {
+      background: radial-gradient(ellipse at 50% 50%, #091326 0%, #03050a 100%);
+      color: var(--color-act3-text);
+    }
+
+    #hacia-adentro .card,
+    #acto-3 .card,
+    #hacia-adentro .ethereal-text-block,
+    #acto-3 .ethereal-text-block {
+      background: rgba(15, 20, 35, 0.55) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(251, 191, 36, 0.25) !important;
+      border-radius: 20px !important;
+      padding: 28px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35) !important;
+      color: #ffffff !important;
+    }
+
+    #hacia-adentro .act-header-tag,
+    #acto-3 .act-header-tag {
+      color: var(--color-act3-gold);
+    }
+
+    #hacia-adentro .act-text-body,
+    #acto-3 .act-text-body {
+      color: #f8fafc;
+      font-size: 1.15rem;
+      font-weight: 400;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+    }
+
+    .quote-box {
+      margin: 0.5rem 0 0.25rem;
+      padding: 1.25rem 1rem;
+      background: rgba(251, 191, 36, 0.08);
+      border-left: 3px solid var(--color-act3-gold);
+      border-radius: 4px;
+    }
+
+    .quote-highlight {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      line-height: 1.65;
+      font-style: italic;
+      color: #fff;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+    }
+
+    .quote-highlight p+p {
+      margin-top: 0.5rem;
+    }
+
+    #hacia-adentro .touch-hint-pill,
+    #acto-3 .touch-hint-pill {
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fde68a;
+    }
+
+    /* ==========================================================================
+       7. SECCIÓN IV · HACIA DONDE SIGA
+       ========================================================================== */
+    #hacia-donde-siga,
+    #acto-4 {
+      background: radial-gradient(circle at 50% 25%, #3a2e38 0%, #211c26 55%, #16141c 100%);
+      color: var(--color-act4-text);
+      text-align: center;
+      padding-bottom: 5.5rem;
+    }
+
+    #hacia-donde-siga .act-content-wrapper,
+    #acto-4 .act-content-wrapper {
+      align-items: center;
+      text-align: center;
+    }
+
+    #hacia-donde-siga .card,
+    #acto-4 .card,
+    #hacia-donde-siga .ethereal-text-block,
+    #acto-4 .ethereal-text-block {
+      background: rgba(35, 28, 42, 0.38) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(246, 189, 96, 0.25) !important;
+      border-radius: 20px !important;
+      padding: 28px !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35) !important;
+      text-align: center;
+      align-items: center;
+    }
+
+    #hacia-donde-siga .act-header-tag,
+    #acto-4 .act-header-tag {
+      color: var(--color-act4-sun);
+      justify-content: center;
+    }
+
+    #hacia-donde-siga .act-header-tag::before,
+    #acto-4 .act-header-tag::before {
+      display: none;
+    }
+
+    #hacia-donde-siga .act-title,
+    #acto-4 .act-title {
+      font-family: var(--font-display);
+      color: #fff;
+      font-size: 2.1rem;
+    }
+
+    #hacia-donde-siga .act-text-body,
+    #acto-4 .act-text-body {
+      font-family: var(--font-sans);
+      font-size: 1.15rem;
+      line-height: 1.85;
+      color: #fefae0;
+      max-width: 500px;
+      text-align: center;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+    }
+
+    .orbit-stage-container {
+      position: relative;
+      width: 230px;
+      height: 230px;
+      margin: 0.75rem auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .central-sun {
+      width: 54px;
+      height: 54px;
+      background: radial-gradient(circle, #ffeaa7 20%, #f6bd60 60%, #e07a5f 100%);
+      border-radius: 50%;
+      box-shadow:
+        0 0 30px #f6bd60,
+        0 0 65px rgba(224, 122, 95, 0.6),
+        0 0 110px rgba(246, 189, 96, 0.4);
+      position: relative;
+      z-index: 2;
+      animation: sunPulse 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes sunPulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 25px #f6bd60, 0 0 55px rgba(224, 122, 95, 0.5);
+      }
+
+      100% {
+        transform: scale(1.05);
+        box-shadow: 0 0 40px #ffeaa7, 0 0 85px rgba(224, 122, 95, 0.8);
+      }
+    }
+
+    .orbit-ring {
+      position: absolute;
+      width: 195px;
+      height: 195px;
+      border: 1px dashed rgba(246, 189, 96, 0.35);
+      border-radius: 50%;
+      animation: rotateOrbit 20s linear infinite;
+    }
+
+    @keyframes rotateOrbit {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .orbit-satellite-wheel {
+      position: absolute;
+      top: -15px;
+      left: calc(50% - 15px);
+      width: 30px;
+      height: 30px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: rgba(10, 10, 15, 0.85);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: spinWheelSelf 3s linear infinite;
+    }
+
+    .wheel-spoke {
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .wheel-spoke:nth-child(1) {
+      transform: rotate(0deg);
+    }
+
+    .wheel-spoke:nth-child(2) {
+      transform: rotate(45deg);
+    }
+
+    .wheel-spoke:nth-child(3) {
+      transform: rotate(90deg);
+    }
+
+    .wheel-spoke:nth-child(4) {
+      transform: rotate(135deg);
+    }
+
+    .wheel-hub {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: var(--color-act4-sun);
+      border-radius: 50%;
+      z-index: 3;
+    }
+
+    @keyframes spinWheelSelf {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .orbit-date-tag {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.3em;
+      color: var(--color-act4-sun);
+      margin-top: 0.25rem;
+      font-weight: 600;
+    }
+
+    .signature-final-block {
+      margin-top: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .sign-author {
+      font-family: var(--font-signature);
+      font-size: 3.8rem;
+      color: #ffd6a5;
+      text-shadow: 0 0 20px rgba(255, 214, 165, 0.4);
+      line-height: 1.1;
+      margin-top: 0.25rem;
+    }
+
+    /* ==========================================================================
+       8. RESPONSIVIDAD Y AJUSTES MOBILE
+       ========================================================================== */
+    @media (max-width: 480px) {
+      section.act-section {
+        padding: 4rem 1.15rem 3.5rem;
+      }
+
+      .card,
+      .ethereal-text-block {
+        padding: 20px 16px;
+        border-radius: 16px;
+      }
+
+      .odometer-digit-box {
+        width: 26px;
+        height: 40px;
+      }
+
+      .odometer-digit-item {
+        height: 40px;
+        font-size: 1.4rem;
+      }
+
+      .odometer-separator {
+        font-size: 1rem;
+        padding: 0 0.1rem;
+      }
+
+      .act-title {
+        font-size: 1.65rem;
+      }
+
+      .portada-intro-text {
+        font-size: 1.25rem;
+      }
+
+      .quote-highlight {
+        font-size: 1.25rem;
+      }
+
+      .orbit-stage-container {
+        width: 200px;
+        height: 200px;
+      }
+
+      .orbit-ring {
+        width: 170px;
+        height: 170px;
+      }
+
+      .sign-author {
+        font-size: 3.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Barra de progreso superior -->
+  <div id="route-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+
+  <div class="app-container">
+
+    <!-- ==========================================================================
+         PORTADA: ODÓMETRO MECÁNICO & COMIENZO DEL VIAJE
+         ========================================================================== -->
+    <section id="portada" class="act-section" aria-label="Portada y Odómetro">
+      <div class="act-content-wrapper" style="align-items: center; text-align: center;">
+
+        <span class="portada-badge">Registro de Ruta · Coordenada Temporal</span>
+
+        <!-- Odómetro / Contador Acelerado -->
+        <div class="odometer-wrapper" id="odometer-container" aria-label="Fecha fijada: 21 de Septiembre de 2026">
+          <!-- Día: 21 -->
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-d1"></div>
+          </div>
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-d2"></div>
+          </div>
+
+          <div class="odometer-separator">·</div>
+
+          <!-- Mes: 09 -->
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-m1"></div>
+          </div>
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-m2"></div>
+          </div>
+
+          <div class="odometer-separator">·</div>
+
+          <!-- Año: 2026 -->
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-y1"></div>
+          </div>
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-y2"></div>
+          </div>
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-y3"></div>
+          </div>
+          <div class="odometer-digit-box">
+            <div class="odometer-digit-strip" id="odo-y4"></div>
+          </div>
+        </div>
+
+        <p class="portada-intro-text">
+          "Hoy no quería mandarte una tarjeta de cumpleaños. Quería regalarte un pequeño viaje."
+        </p>
+
+        <a href="#hacia-atras" id="btn-comenzar" class="btn-route" aria-label="Comenzar viaje al primer acto">
+          <span>COMENZAR</span>
+          <span aria-hidden="true">→</span>
+        </a>
+
+        <div class="scroll-indicator" aria-hidden="true">
+          <span>Desliza para avanzar</span>
+          <span>↓</span>
+        </div>
+        <audio id="bg-music" src="assets/audio/Mapas_en_el_corazón.mp3" preload="auto"></audio>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================================
+         I · HACIA ATRÁS (fondo-mapa.jpg)
+         ========================================================================== -->
+    <section id="hacia-atras" class="act-section" aria-label="Acto I: Hacia Atrás">
+      <canvas id="canvas-huellas" class="canvas-layer"></canvas>
+
+      <div class="act-content-wrapper">
+        <div class="card ethereal-text-block">
+          <span class="act-header-tag">I · Hacia Atrás</span>
+
+          <div class="act-text-body">
+            <p>Nuestro primer viaje fue hacia atrás.</p>
+            <p>Empezó con Maximiliano.</p>
+            <p>Y de pronto descubrí que detrás de una conversación había alguien capaz de llevarme siglos atrás y
+              hacerme querer quedarme a escuchar.</p>
+            <p>(aunque mi nivel de turista histórica nunca haya alcanzado tu <span class="easter-egg-trigger"
+                id="easter-egg-trigger" role="button" tabindex="0" title="Toca para ver la nota">categoría
+                profesional</span> 😂)</p>
+          </div>
+
+          <div class="touch-hint-pill">
+            <span aria-hidden="true">👣</span>
+            <span>Toca o desliza en cualquier lugar para caminar juntos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================================
+         II · HACIA ADELANTE (fondo-ruta.jpg)
+         ========================================================================== -->
+    <section id="hacia-adelante" class="act-section" aria-label="Acto II: Hacia Adelante">
+      <canvas id="canvas-bicicleta" class="canvas-layer"></canvas>
+
+      <div class="act-content-wrapper">
+        <div class="card ethereal-text-block">
+          <span class="act-header-tag">II · Hacia Adelante</span>
+
+          <div class="act-text-body">
+            <p>Después descubrimos otra manera de viajar.</p>
+            <p>Esta vez sobre dos ruedas.</p>
+            <p>Me llevaste por primera vez a Guitarritas.</p>
+            <p>Intentaste enseñarme de cadencia, técnica y quién sabe cuántas cosas más…</p>
+            <p>y descubrí también que eras un maestro bastante exigente. 😂</p>
+          </div>
+
+          <div class="touch-hint-pill">
+            <span aria-hidden="true">🚲</span>
+            <span>Desliza para trazar rodadas y escuchar la ruta</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================================
+         III · HACIA ADENTRO (Noche Profunda & Constelaciones)
+         ========================================================================== -->
+    <section id="hacia-adentro" class="act-section" aria-label="Acto III: Hacia Adentro">
+      <canvas id="canvas-constelacion" class="canvas-layer"></canvas>
+
+      <div class="act-content-wrapper">
+        <div class="card ethereal-text-block">
+          <span class="act-header-tag">III · Hacia Adentro</span>
+
+          <div class="act-text-body">
+            <p>Pero creo que el viaje que más valoro empezó después.</p>
+            <p>El de una amistad en la que podemos quitarnos las armaduras.</p>
+            <p>Contarnos lo bonito, lo incómodo, lo absurdo, lo que nos da miedo y lo que no le contaríamos a
+              cualquiera…</p>
+            <p>sin vergüenza y sin juicio.</p>
+          </div>
+
+          <!-- Frase destacada -->
+          <div class="quote-box">
+            <div class="quote-highlight">
+              <p>Hay personas con las que recorres lugares.</p>
+              <p>Y hay personas con las que puedes recorrer partes de ti.</p>
+            </div>
+          </div>
+
+          <div class="touch-hint-pill">
+            <span aria-hidden="true">✨</span>
+            <span>Toca el cielo para encender y unir constelaciones</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================================
+         IV · HACIA DONDE SIGA (Amanecer, Órbita Solar & Deseos)
+         ========================================================================== -->
+    <section id="hacia-donde-siga" class="act-section" aria-label="Acto IV: Hacia Donde Siga">
+      <div class="act-content-wrapper">
+        <div class="card ethereal-text-block">
+          <span class="act-header-tag">IV · Hacia Donde Siga</span>
+
+          <!-- Rueda de bicicleta orbitando alrededor del sol -->
+          <div class="orbit-stage-container" aria-label="Órbita solar conmemorativa">
+            <div class="central-sun" aria-hidden="true"></div>
+            <div class="orbit-ring" aria-hidden="true">
+              <div class="orbit-satellite-wheel">
+                <div class="wheel-spoke"></div>
+                <div class="wheel-spoke"></div>
+                <div class="wheel-spoke"></div>
+                <div class="wheel-spoke"></div>
+                <div class="wheel-hub"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="orbit-date-tag">21 · 09 · 2026</div>
+
+          <div class="act-text-body">
+            <p>No sé hacia dónde te lleve esta nueva vuelta.</p>
+            <p>Quizá a otra historia.</p>
+            <p>A otra carretera.</p>
+            <p>A otra versión de ti.</p>
+            <p>Pero deseo que encuentres muchos lugares que te den ganas de detenerte, aprender, mirar alrededor… y
+              seguir.</p>
+            <p>El destino lo eliges tú.</p>
+            <p>Yo solamente quería desearte un muy feliz viaje alrededor del sol.</p>
+          </div>
+
+          <div class="signature-final-block">
+            <h3 style="font-family: var(--font-display); font-size: 1.65rem; color: #fff; letter-spacing: 0.04em;">Feliz
+              cumpleaños, Alain.</h3>
+            <div class="sign-author">— Jannet</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /app-container -->
+
+
+  <!-- ==========================================================================
+       MODAL EASTER EGG (Certificado de Historiador)
+       ========================================================================== -->
+  <div id="easter-egg-modal" class="easter-egg-note" role="dialog" aria-modal="true" aria-labelledby="easter-egg-title"
+    aria-hidden="true">
+    <div class="easter-egg-seal" aria-hidden="true">★</div>
+    <div class="easter-egg-note-header" id="easter-egg-title">Acreditación Histórica Honorífica</div>
+    <div class="easter-egg-note-content">
+      [Certificado de historiador nivel Dios otorgado por Jannet]
+    </div>
+    <p style="font-size: 0.95rem; font-style: italic; color: #5e4f42; margin-bottom: 1.25rem;">
+      Válido para todas las expediciones pasadas, presentes y futuras.
+    </p>
+    <button id="btn-close-easter-egg" class="easter-egg-close-btn">Aceptar Dictamen</button>
+  </div>
+
+
+  <!-- ==========================================================================
+       JAVASCRIPT: INTERACCIONES, ODÓMETRO, CANVAS & WEB AUDIO
+       ========================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* --------------------------------------------------------------------------
+         1. CONTROL DE AUDIO SINTÉTICO (PIÑÓN DE RUTA / RATCHET SOUND)
+         -------------------------------------------------------------------------- */
+      let audioCtx = null;
+      let lastAudioClickTime = 0;
+
+      function initAudio() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      function playRatchetClick(speedMultiplier = 1) {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        if (now - lastAudioClickTime < 0.035 / Math.min(speedMultiplier, 3)) return;
+        lastAudioClickTime = now;
+
+        try {
+          const bufferSize = audioCtx.sampleRate * 0.008; // 8ms
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+          }
+
+          const noiseSource = audioCtx.createBufferSource();
+          noiseSource.buffer = buffer;
+
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(3400 + Math.random() * 400, now);
+          filter.Q.setValueAtTime(9, now);
+
+          const osc = audioCtx.createOscillator();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(4000 + Math.random() * 200, now);
+          osc.frequency.exponentialRampToValueAtTime(1100, now + 0.012);
+
+          const oscGain = audioCtx.createGain();
+          oscGain.gain.setValueAtTime(0.045, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.012);
+
+          const masterGain = audioCtx.createGain();
+          masterGain.gain.setValueAtTime(0.14, now);
+          masterGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+          noiseSource.connect(filter);
+          filter.connect(masterGain);
+          osc.connect(oscGain);
+          oscGain.connect(masterGain);
+          masterGain.connect(audioCtx.destination);
+
+          noiseSource.start(now);
+          osc.start(now);
+          osc.stop(now + 0.02);
+        } catch (e) { }
+      }
+
+      window.addEventListener('pointerdown', initAudio, { once: true });
+      window.addEventListener('touchstart', initAudio, { once: true });
+
+
+      /* --------------------------------------------------------------------------
+         2. ODÓMETRO ACELERADO Y FRENADO EN SECO (PORTADA)
+         -------------------------------------------------------------------------- */
+      const targetDate = "21092026";
+      const digitIds = ['odo-d1', 'odo-d2', 'odo-m1', 'odo-m2', 'odo-y1', 'odo-y2', 'odo-y3', 'odo-y4'];
+
+      digitIds.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const targetDigit = parseInt(targetDate[idx], 10);
+        let itemsHtml = '';
+        for (let loop = 0; loop < 4; loop++) {
+          for (let d = 0; d < 10; d++) {
+            itemsHtml += `<div class="odometer-digit-item">${d}</div>`;
+          }
+        }
+        itemsHtml += `<div class="odometer-digit-item">${targetDigit}</div>`;
+        el.innerHTML = itemsHtml;
+      });
+
+      function animateOdometer() {
+        const itemHeight = 48;
+        digitIds.forEach((id, idx) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const targetDigit = parseInt(targetDate[idx], 10);
+          const totalSteps = (3 * 10) + targetDigit;
+          const finalTranslate = -(totalSteps * itemHeight);
+
+          const duration = 1800 + (idx * 160);
+          el.style.transition = `transform ${duration}ms cubic-bezier(0.12, 0.9, 0.18, 1)`;
+
+          requestAnimationFrame(() => {
+            el.style.transform = `translateY(${finalTranslate}px)`;
+          });
+        });
+      }
+
+      window.addEventListener('load', () => {
+        setTimeout(animateOdometer, 300);
+      });
+
+
+      /* --------------------------------------------------------------------------
+         3. BARRA DE PROGRESO DE RUTA (SCROLL SPY)
+         -------------------------------------------------------------------------- */
+      const progressBar = document.getElementById('route-progress-bar');
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        if (progressBar) {
+          progressBar.style.width = `${progress}%`;
+          progressBar.setAttribute('aria-valuenow', Math.round(progress));
+        }
+      }, { passive: true });
+
+
+      /* --------------------------------------------------------------------------
+         4. SECCIÓN I: CANVAS DE HUELLAS DE CALZADO (z-index 20)
+         -------------------------------------------------------------------------- */
+      const secAct1 = document.getElementById('hacia-atras') || document.getElementById('acto-1');
+      const canvasHuellas = document.getElementById('canvas-huellas');
+      const ctxHuellas = canvasHuellas ? canvasHuellas.getContext('2d') : null;
+      let footprints = [];
+      let lastStepPos = null;
+      let stepToggle = 0;
+
+      function resizeCanvas(canvas) {
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = rect.width * dpr;
+        canvas.height = rect.height * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+      }
+
+      function initCanvases() {
+        if (canvasHuellas) resizeCanvas(canvasHuellas);
+        if (canvasBici) resizeCanvas(canvasBici);
+        if (canvasConstelacion) resizeCanvas(canvasConstelacion);
+      }
+
+      window.addEventListener('resize', initCanvases);
+      setTimeout(initCanvases, 100);
+
+      function drawShoePrint(ctx, x, y, angle, isLeft, isPersonB, alpha) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        ctx.globalAlpha = Math.max(0, alpha);
+
+        // Tinta sepia oscura y definida
+        ctx.fillStyle = isPersonB ? '#3a2416' : '#1e120a';
+        const scale = isPersonB ? 1.0 : 1.18;
+        ctx.scale(scale, scale);
+
+        ctx.beginPath();
+        const lateralShift = isLeft ? -2 : 2;
+        ctx.ellipse(lateralShift, -7, 6.5, 11, (isLeft ? -0.12 : 0.12), 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(lateralShift, 10, 5.5, 6.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+
+      function addInstantFootprint(x, y) {
+        const isLeft = (stepToggle % 2 === 0);
+        const isPersonB = (stepToggle >= 2);
+        const lateralOffset = (isLeft ? -12 : 12) + (isPersonB ? 18 : -10);
+
+        footprints.push({
+          x: x + lateralOffset,
+          y: y,
+          angle: (Math.random() * 0.3 - 0.15),
+          isLeft: isLeft,
+          isPersonB: isPersonB,
+          alpha: 0.9,
+          decay: 0.002
+        });
+
+        if (footprints.length > 60) footprints.shift();
+        stepToggle = (stepToggle + 1) % 4;
+        lastStepPos = { x, y };
+      }
+
+      function addFootprintStep(x, y) {
+        if (!lastStepPos) {
+          addInstantFootprint(x, y);
+          return;
+        }
+
+        const dx = x - lastStepPos.x;
+        const dy = y - lastStepPos.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > 26) {
+          const angle = Math.atan2(dy, dx) + Math.PI / 2;
+          const isLeft = (stepToggle % 2 === 0);
+          const isPersonB = (stepToggle >= 2);
+          const lateralOffset = (isLeft ? -11 : 11) + (isPersonB ? 16 : -8);
+
+          const stepX = x + Math.cos(angle + Math.PI / 2) * lateralOffset;
+          const stepY = y + Math.sin(angle + Math.PI / 2) * lateralOffset;
+
+          footprints.push({
+            x: stepX,
+            y: stepY,
+            angle: angle,
+            isLeft: isLeft,
+            isPersonB: isPersonB,
+            alpha: 0.9,
+            decay: 0.0025
+          });
+
+          if (footprints.length > 60) footprints.shift();
+          stepToggle = (stepToggle + 1) % 4;
+          lastStepPos = { x, y };
+        }
+      }
+
+      function renderFootprints() {
+        if (!canvasHuellas || !ctxHuellas) return;
+        const rect = canvasHuellas.getBoundingClientRect();
+        ctxHuellas.clearRect(0, 0, rect.width, rect.height);
+
+        for (let i = footprints.length - 1; i >= 0; i--) {
+          const fp = footprints[i];
+          drawShoePrint(ctxHuellas, fp.x, fp.y, fp.angle, fp.isLeft, fp.isPersonB, fp.alpha);
+          fp.alpha -= fp.decay;
+          if (fp.alpha <= 0) {
+            footprints.splice(i, 1);
+          }
+        }
+        requestAnimationFrame(renderFootprints);
+      }
+      renderFootprints();
+
+      if (secAct1 && canvasHuellas) {
+        function getCoords(e) {
+          const rect = canvasHuellas.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        secAct1.addEventListener('pointerdown', (e) => {
+          const { x, y } = getCoords(e);
+          addInstantFootprint(x, y);
+        });
+
+        secAct1.addEventListener('pointermove', (e) => {
+          if (e.buttons > 0 || e.pointerType === 'touch') {
+            const { x, y } = getCoords(e);
+            addFootprintStep(x, y);
+          }
+        });
+
+        secAct1.addEventListener('touchmove', (e) => {
+          const { x, y } = getCoords(e);
+          addFootprintStep(x, y);
+        }, { passive: true });
+      }
+
+
+      /* --------------------------------------------------------------------------
+         5. EASTER EGG (CERTIFICADO DE HISTORIADOR)
+         -------------------------------------------------------------------------- */
+      const easterEggTrigger = document.getElementById('easter-egg-trigger');
+      const easterEggModal = document.getElementById('easter-egg-modal');
+      const btnCloseEasterEgg = document.getElementById('btn-close-easter-egg');
+
+      function openEasterEgg(e) {
+        if (e) e.stopPropagation();
+        if (easterEggModal) {
+          easterEggModal.classList.add('active');
+          easterEggModal.setAttribute('aria-hidden', 'false');
+        }
+      }
+
+      function closeEasterEgg(e) {
+        if (e) e.stopPropagation();
+        if (easterEggModal) {
+          easterEggModal.classList.remove('active');
+          easterEggModal.setAttribute('aria-hidden', 'true');
+        }
+      }
+
+      if (easterEggTrigger) {
+        easterEggTrigger.addEventListener('click', openEasterEgg);
+        easterEggTrigger.addEventListener('pointerdown', (e) => e.stopPropagation());
+      }
+
+      if (btnCloseEasterEgg) {
+        btnCloseEasterEgg.addEventListener('click', closeEasterEgg);
+      }
+
+      window.addEventListener('click', (e) => {
+        if (easterEggModal && easterEggModal.classList.contains('active')) {
+          if (!easterEggModal.contains(e.target) && e.target !== easterEggTrigger) {
+            closeEasterEgg(e);
+          }
+        }
+      });
+
+
+      /* --------------------------------------------------------------------------
+         6. SECCIÓN II: CANVAS DE RODADAS DE BICICLETA (z-index 20)
+         -------------------------------------------------------------------------- */
+      const secAct2 = document.getElementById('hacia-adelante') || document.getElementById('acto-2');
+      const canvasBici = document.getElementById('canvas-bicicleta');
+      const ctxBici = canvasBici ? canvasBici.getContext('2d') : null;
+      let tireTracks = [];
+      let lastBikePos = null;
+
+      function addBikeTrack(x, y) {
+        if (!lastBikePos) {
+          lastBikePos = { x, y, time: performance.now() };
+          playRatchetClick(1.5);
+          return;
+        }
+
+        const now = performance.now();
+        const dt = Math.max(1, now - lastBikePos.time);
+        const dx = x - lastBikePos.x;
+        const dy = y - lastBikePos.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > 5) {
+          const angle = Math.atan2(dy, dx);
+          const speed = dist / dt;
+
+          tireTracks.push({
+            x1: lastBikePos.x,
+            y1: lastBikePos.y,
+            x2: x,
+            y2: y,
+            angle: angle,
+            alpha: 0.95,
+            decay: 0.0025
+          });
+
+          if (tireTracks.length > 100) tireTracks.shift();
+
+          playRatchetClick(speed * 2.8);
+          lastBikePos = { x, y, time: now };
+        }
+      }
+
+      function renderTireTracks() {
+        if (!canvasBici || !ctxBici) return;
+        const rect = canvasBici.getBoundingClientRect();
+        ctxBici.clearRect(0, 0, rect.width, rect.height);
+
+        const tireWidth = 5;
+        const tireSpacing = 8.5;
+
+        for (let i = tireTracks.length - 1; i >= 0; i--) {
+          const track = tireTracks[i];
+          ctxBici.save();
+          ctxBici.globalAlpha = Math.max(0, track.alpha);
+
+          const perpAngle = track.angle + Math.PI / 2;
+          const offX = Math.cos(perpAngle) * tireSpacing;
+          const offY = Math.sin(perpAngle) * tireSpacing;
+
+          [-1, 1].forEach(dir => {
+            ctxBici.beginPath();
+            ctxBici.moveTo(track.x1 + offX * dir * 0.5, track.y1 + offY * dir * 0.5);
+            ctxBici.lineTo(track.x2 + offX * dir * 0.5, track.y2 + offY * dir * 0.5);
+            ctxBici.strokeStyle = '#182b20';
+            ctxBici.lineWidth = tireWidth;
+            ctxBici.lineCap = 'round';
+            ctxBici.stroke();
+
+            ctxBici.beginPath();
+            ctxBici.moveTo(track.x1 + offX * dir * 0.5, track.y1 + offY * dir * 0.5);
+            ctxBici.lineTo(track.x2 + offX * dir * 0.5, track.y2 + offY * dir * 0.5);
+            ctxBici.strokeStyle = '#4ade80';
+            ctxBici.lineWidth = 1.6;
+            ctxBici.stroke();
+          });
+
+          ctxBici.restore();
+
+          track.alpha -= track.decay;
+          if (track.alpha <= 0) {
+            tireTracks.splice(i, 1);
+          }
+        }
+        requestAnimationFrame(renderTireTracks);
+      }
+      renderTireTracks();
+
+      if (secAct2 && canvasBici) {
+        function getCoords(e) {
+          const rect = canvasBici.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        secAct2.addEventListener('pointerdown', (e) => {
+          initAudio();
+          const { x, y } = getCoords(e);
+          lastBikePos = null;
+          addBikeTrack(x, y);
+        });
+
+        secAct2.addEventListener('pointermove', (e) => {
+          if (e.buttons > 0 || e.pointerType === 'touch') {
+            const { x, y } = getCoords(e);
+            addBikeTrack(x, y);
+          }
+        });
+
+        secAct2.addEventListener('touchmove', (e) => {
+          const { x, y } = getCoords(e);
+          addBikeTrack(x, y);
+        }, { passive: true });
+      }
+
+
+      /* --------------------------------------------------------------------------
+         7. SECCIÓN III: CANVAS DE CONSTELACIONES CELESTES
+         -------------------------------------------------------------------------- */
+      const secAct3 = document.getElementById('hacia-adentro') || document.getElementById('acto-3');
+      const canvasConstelacion = document.getElementById('canvas-constelacion');
+      const ctxConstelacion = canvasConstelacion ? canvasConstelacion.getContext('2d') : null;
+      let stars = [];
+      const MAX_STARS = 45;
+
+      let backgroundStars = [];
+      function createBackgroundStars() {
+        backgroundStars = [];
+        for (let i = 0; i < 60; i++) {
+          backgroundStars.push({
+            x: Math.random(),
+            y: Math.random(),
+            r: Math.random() * 1.2 + 0.3,
+            alpha: Math.random() * 0.5 + 0.2,
+            blinkSpeed: Math.random() * 0.02 + 0.005,
+            blinkPhase: Math.random() * Math.PI * 2
+          });
+        }
+      }
+      createBackgroundStars();
+
+      function addConstellationStar(x, y) {
+        stars.push({
+          x,
+          y,
+          r: Math.random() * 2 + 2.8,
+          createdAt: performance.now(),
+          pulsePhase: 0,
+          label: `α-${String.fromCharCode(65 + (stars.length % 26))}${stars.length + 1}`
+        });
+
+        if (stars.length > MAX_STARS) {
+          stars.shift();
+        }
+      }
+
+      function renderConstellations() {
+        if (!canvasConstelacion || !ctxConstelacion) return;
+        const rect = canvasConstelacion.getBoundingClientRect();
+        ctxConstelacion.clearRect(0, 0, rect.width, rect.height);
+
+        const now = performance.now();
+
+        backgroundStars.forEach(s => {
+          const sx = s.x * rect.width;
+          const sy = s.y * rect.height;
+          const currentAlpha = s.alpha + Math.sin(now * s.blinkSpeed + s.blinkPhase) * 0.15;
+          ctxConstelacion.fillStyle = `rgba(255, 255, 255, ${Math.max(0.05, currentAlpha)})`;
+          ctxConstelacion.beginPath();
+          ctxConstelacion.arc(sx, sy, s.r, 0, Math.PI * 2);
+          ctxConstelacion.fill();
+        });
+
+        if (stars.length > 1) {
+          ctxConstelacion.save();
+          for (let i = 0; i < stars.length; i++) {
+            for (let j = i + 1; j < stars.length; j++) {
+              const d = Math.hypot(stars[i].x - stars[j].x, stars[i].y - stars[j].y);
+              if (d < 180 || j === i + 1) {
+                const lineAlpha = Math.max(0.12, 1 - (d / 200)) * 0.75;
+                ctxConstelacion.beginPath();
+                ctxConstelacion.moveTo(stars[i].x, stars[i].y);
+                ctxConstelacion.lineTo(stars[j].x, stars[j].y);
+                ctxConstelacion.strokeStyle = `rgba(251, 191, 36, ${lineAlpha})`;
+                ctxConstelacion.lineWidth = 0.95;
+                ctxConstelacion.setLineDash([4, 2]);
+                ctxConstelacion.stroke();
+              }
+            }
+          }
+          ctxConstelacion.restore();
+        }
+
+        stars.forEach(st => {
+          const pulse = Math.sin(now * 0.004 + st.createdAt) * 0.8;
+          const radius = Math.max(1, st.r + pulse);
+
+          const gradient = ctxConstelacion.createRadialGradient(st.x, st.y, 0, st.x, st.y, radius * 3.8);
+          gradient.addColorStop(0, 'rgba(251, 191, 36, 0.95)');
+          gradient.addColorStop(0.5, 'rgba(251, 191, 36, 0.3)');
+          gradient.addColorStop(1, 'rgba(251, 191, 36, 0)');
+
+          ctxConstelacion.fillStyle = gradient;
+          ctxConstelacion.beginPath();
+          ctxConstelacion.arc(st.x, st.y, radius * 3.8, 0, Math.PI * 2);
+          ctxConstelacion.fill();
+
+          ctxConstelacion.fillStyle = '#ffffff';
+          ctxConstelacion.beginPath();
+          ctxConstelacion.arc(st.x, st.y, radius * 0.9, 0, Math.PI * 2);
+          ctxConstelacion.fill();
+
+          ctxConstelacion.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+          ctxConstelacion.lineWidth = 0.6;
+          ctxConstelacion.setLineDash([]);
+          ctxConstelacion.beginPath();
+          ctxConstelacion.arc(st.x, st.y, radius * 2.3, 0, Math.PI * 2);
+          ctxConstelacion.stroke();
+        });
+
+        requestAnimationFrame(renderConstellations);
+      }
+      renderConstellations();
+
+      if (secAct3 && canvasConstelacion) {
+        function getCoords(e) {
+          const rect = canvasConstelacion.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+          return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        secAct3.addEventListener('pointerdown', (e) => {
+          const { x, y } = getCoords(e);
+          addConstellationStar(x, y);
+        });
+
+        secAct3.addEventListener('touchstart', (e) => {
+          const { x, y } = getCoords(e);
+          addConstellationStar(x, y);
+        }, { passive: true });
+      }
+
+    })();
+  </script>
+  <script>
+    const btnComenzar = document.getElementById('btn-comenzar');
+    const musica = document.getElementById('bg-music');
+
+    if (btnComenzar && musica) {
+      btnComenzar.addEventListener('click', () => {
+        musica.volume = 0.75;
+        musica.play().catch(e => console.log('Interacción requerida:', e));
+      });
+    }
+  </script>
+</body>
+
+</html>
