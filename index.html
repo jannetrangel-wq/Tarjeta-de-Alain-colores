@@ -1343,15 +1343,7 @@ if (document.readyState === 'complete') {
 } else {
   window.addEventListener('load', animateOdometer);
 }
-          requestAnimationFrame(() => {
-            el.style.transform = `translateY(${finalTranslate}px)`;
-          });
-        });
-      }
-
-      window.addEventListener('load', () => {
-        setTimeout(animateOdometer, 300);
-      });
+          
 
 
       /* --------------------------------------------------------------------------
