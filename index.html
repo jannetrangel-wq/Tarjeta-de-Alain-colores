@@ -943,15 +943,24 @@
         border-radius: 16px;
       }
 
-      .odometer-digit-box {
-        width: 26px;
-        height: 40px;
-      }
+    .odometer-digit-box {
+  width: 26px;
+  height: 40px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
 
-      .odometer-digit-item {
-        height: 40px;
-        font-size: 1.4rem;
-      }
+.odometer-digit-item {
+  height: 40px;
+  width: 100%;
+  font-size: 1.4rem;
+  line-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
       .odometer-separator {
         font-size: 1rem;
@@ -1292,38 +1301,47 @@
          2. ODÓMETRO ACELERADO Y FRENADO EN SECO (PORTADA)
          -------------------------------------------------------------------------- */
       const targetDate = "21092026";
-      const digitIds = ['odo-d1', 'odo-d2', 'odo-m1', 'odo-m2', 'odo-y1', 'odo-y2', 'odo-y3', 'odo-y4'];
+const digitIds = ['odo-d1', 'odo-d2', 'odo-m1', 'odo-m2', 'odo-y1', 'odo-y2', 'odo-y3', 'odo-y4'];
 
-      digitIds.forEach((id, idx) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        const targetDigit = parseInt(targetDate[idx], 10);
-        let itemsHtml = '';
-        for (let loop = 0; loop < 4; loop++) {
-          for (let d = 0; d < 10; d++) {
-            itemsHtml += `<div class="odometer-digit-item">${d}</div>`;
-          }
-        }
-        itemsHtml += `<div class="odometer-digit-item">${targetDigit}</div>`;
-        el.innerHTML = itemsHtml;
-      });
+// 1. Rellenar las tiras con los números
+digitIds.forEach((id, idx) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const targetDigit = parseInt(targetDate[idx], 10);
+  let itemsHtml = '';
+  for (let loop = 0; loop < 4; loop++) {
+    for (let d = 0; d < 10; d++) {
+      itemsHtml += `<div class="odometer-digit-item">${d}</div>`;
+    }
+  }
+  itemsHtml += `<div class="odometer-digit-item">${targetDigit}</div>`;
+  el.innerHTML = itemsHtml;
+});
 
-      function animateOdometer() {
+// 2. Animación infalible basada en porcentaje (sin medir píxeles)
+function animateOdometer() {
+  const totalItemsPerStrip = (4 * 10) + 1; // 41 elementos en total
+  const percentPerItem = 100 / totalItemsPerStrip;
+
   digitIds.forEach((id, idx) => {
     const el = document.getElementById(id);
     if (!el) return;
-    
-    // Mide la altura real del número en la pantalla de este celular
-    const itemHeight = el.firstElementChild ? el.firstElementChild.offsetHeight : 48;
-    
+
     const targetDigit = parseInt(targetDate[idx], 10);
-    const totalSteps = (3 * 10) + targetDigit;
-    const finalTranslate = -(totalSteps * itemHeight);
+    const totalSteps = (3 * 10) + targetDigit; // Se detiene en el último ciclo
+    const finalPercent = totalSteps * percentPerItem;
 
     const duration = 1800 + (idx * 160);
     el.style.transition = `transform ${duration}ms cubic-bezier(0.12, 0.9, 0.18, 1)`;
-    el.style.transform = `translateY(${finalTranslate}px)`;
+    el.style.transform = `translateY(-${finalPercent}%)`;
   });
+}
+
+// Ejecutar animación cuando la página y las fuentes estén listas
+if (document.readyState === 'complete') {
+  animateOdometer();
+} else {
+  window.addEventListener('load', animateOdometer);
 }
           requestAnimationFrame(() => {
             el.style.transform = `translateY(${finalTranslate}px)`;
